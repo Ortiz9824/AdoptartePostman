@@ -1,49 +1,31 @@
 package com.example.proyectoFormativo.Controller;
 
-import com.example.proyectoFormativo.Interface.IMascotaService;
-import com.example.proyectoFormativo.Model.Mascota;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.example.proyectoFormativo.Interface.IMascotaService; // <-- LA IMPORTA
+import com.example.proyectoFormativo.Dto.Request.*; // <-- Importa tus DTOs
+import com.example.proyectoFormativo.Dto.Response.*; // <-- Importa tus DTOs
 
-import java.util.List;
+// ... otros imports
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 @RestController
-@RequestMapping("/api/mascotas") // URL base para mascotas
-@RequiredArgsConstructor
-public class MascotaController {
+@RequestMapping("/api/v1/mascotas")
+public class MascotaController { // <-- SOLO LA CLASE CONTROLLER
 
-    private final IMascotaService mascotaService; // Inyecta la INTERFAZ
+    @Autowired
+    private IMascotaService mascotaService;
 
-    @GetMapping
-    public List<Mascota> getAllMascotas() {
-        return mascotaService.getMascotas();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Mascota> getMascotaById(@PathVariable Integer id) {
-        return mascotaService.getMascotaById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    // ... (Todo el código del controlador que vimos antes)
 
     @PostMapping
-    public Mascota createMascota(@RequestBody Mascota mascota) {
-        return mascotaService.createMascota(mascota);
+    public ResponseEntity<MascotaResponseDto> createMascota(
+            @Valid @RequestBody CrearMascotaRequestDto mascotaDto,
+            Authentication authentication
+    ) {
+        // ...
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Mascota> updateMascota(@PathVariable Integer id, @RequestBody Mascota mascotaDetails) {
-        try {
-            return ResponseEntity.ok(mascotaService.updateMascota(id, mascotaDetails));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMascota(@PathVariable Integer id) {
-        mascotaService.deleteMascota(id);
-        return ResponseEntity.ok().build();
-    }
 }
+

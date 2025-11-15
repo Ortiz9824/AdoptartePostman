@@ -1,50 +1,49 @@
 package com.example.proyectoFormativo.Model;
 
+// 👇 ¡CAMBIO AQUÍ! De 'javax' a 'jakarta'
 import jakarta.persistence.*;
 import lombok.Data;
+import org.apache.catalina.User;
 
-@Entity
-@Table(name = "mascota")
 @Data
+@Entity
+@Table(name = "mascotas")
 public class Mascota {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ID_MASCOTA;
+    private Integer id; // Coincide con JpaRepository<..., Integer>
 
-    @Column(name = "NOMBRE_MASCOTA", nullable = false, length = 45)
+    @Column(name = "nombre_mascota", length = 100, nullable = false)
     private String nombreMascota;
 
-    @Column(name = "RAZA_MASCOTA", nullable = false, length = 45)
+    @Column(name = "raza_mascota", length = 100)
     private String razaMascota;
 
-    @Column(name = "EDAD_MASCOTA", length = 7)
-    private String edadMascota;
+    @Column(name = "activo")
+    private boolean activo = true; // Para el borrado lógico
 
-    @Column(name = "DESCRIPCION", nullable = false, length = 300)
-    private String descripcion;
+    // --- RELACIONES ---
 
-    @Column(name = "URL_IMAGEN_MASCOTA", length = 255)
-    private String urlImagenMascota;
-
-    // --- Relaciones (Claves Foráneas) ---
-    // Tu SQL dice que estas clases ya las creaste
-
+    // Relación con el Dueño (User)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Usuario_ID_USUARIO_ADMIN_REFUGIO", nullable = false)
-    private Usuario adminRefugio; // La entidad Usuario que ya creaste
+    @JoinColumn(name = "usuario_id", nullable = false)
+    public User usuario;
 
+    // Relación con Tamaño
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Especie_Mascota_ID_Especie_Mascota", nullable = false)
-    private EspecieMascota especie; // Ya existe en tu carpeta Model
+    @JoinColumn(name = "tamano_mascota_id")
+    private TamanoMascota tamanoMascota;
 
+    // Relación con Tipo de Vivienda
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tamaño_Mascota_ID_Tamaño_Mascota", nullable = false)
-    private TamañoMascota tamaño; // Ya existe en tu carpeta Model
+    @JoinColumn(name = "tipo_vivienda_id")
+    private TipoVivienda tipoVivienda;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Estado_Mascota_ID_Estado_Mascota", nullable = false)
-    private EstadoMascota estado; // Ya existe en tu carpeta Model
+    // ¡ESTA ES LA LÍNEA QUE DA EL OTRO ERROR!
+    // Relación con su Historia Médica
+    @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private HistoriaMedica historiaMedica;
 
-    // Omitimos las relaciones con Evaluacion y Solicitud por ahora para simplificar
+    // ... (Añade relaciones con Especie, EstadoMascota, etc. si las tienes)
 }

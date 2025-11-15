@@ -1,3 +1,23 @@
-package com.example.proyectoFormativo.Dto;
+package com.example.proyectoFormativo.Dto.Response;
 
-public record JwtResponse(String access_token, String token_type, long expires_in) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class JwtResponse {
+
+    // El token JWT
+    private String token;
+
+    // El tipo de token (normalmente "Bearer")
+    private String tokenType;
+
+    // El tiempo de expiración en segundos
+    private long expiresInSeconds;
+
+}

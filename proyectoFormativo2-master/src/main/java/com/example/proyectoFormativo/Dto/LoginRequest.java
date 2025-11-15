@@ -1,4 +1,4 @@
-package com.example.proyectoFormativo.Dto.Request; // <-- El paquete debe ser este
+package com.example.proyectoFormativo.Dto.LoginRequest; // <-- El paquete debe ser este
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,8 +1,10 @@
+// En tu archivo de configuración de Seguridad (ej. SecurityConfig.java)
 package com.example.proyectoFormativo.Config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,33 +13,41 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthFilter jwtAuthFilter; // Tu filtro JWT
-    private final AuthManagerConfig authenticationProvider; // Tu proveedor de autenticación
+    // Asumo que ya tienes inyectados tu JwtAuthenticationFilter y AuthenticationProvider
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+
+    // ... (Tu constructor)
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para APIs REST
+
+        http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Permite el acceso público a los endpoints de registro y login
-                        .requestMatchers("/api/auth/**").permitAll()
 
-                        // Define permisos basados en roles
-                        // (Ejemplo: Solo 'Administrador' puede ver /api/usuarios)
-                        .requestMatchers("/api/usuarios/**").hasAuthority("Administrador")
-                        .requestMatchers("/api/mascotas/**").hasAnyAuthority("Administrador", "Administrador Refugio")
+                        // 1. ENDPOINTS PÚBLICOS (Login y Registro)
+                        .requestMatchers("/api/v1/auth/**").permitAll() // Todos pueden loguearse/registrarse
 
-                        // Cualquier otra petición debe estar autenticada
+                        // 2. ENDPOINTS PARA CLIENTES (Dueños de mascotas)
+                        // Un CLIENTE puede ver sus mascotas y crear mascotas
+                        .requestMatchers(HttpMethod.POST, "/api/v1/mascotas").hasRole("CLIENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/mascotas/**").hasRole("CLIENTE")
+
+                        // 3. ENDPOINTS SOLO PARA VETERINARIO (¡Tu requisito!)
+                        // Solo un VETERINARIO puede ver/editar historias y consultas
+                        .requestMatchers("/api/v1/historias-medicas/**").hasRole("VETERINARIO")
+                        .requestMatchers("/api/v1/consultas-medicas/**").hasRole("VETERINARIO")
+
+                        // 4. CUALQUIER OTRA PETICIÓN debe estar autenticada
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Sesiones sin estado
-                )
-                .authenticationProvider(authenticationProvider.authenticationProvider()) // Usa tu AuthManagerConfig
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class) // Añade tu filtro JWT
-                .build();
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 }

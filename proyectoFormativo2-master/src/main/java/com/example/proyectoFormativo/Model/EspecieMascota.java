@@ -9,6 +9,7 @@ import lombok.Data;
 public class EspecieMascota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_Especie_Mascota")
     private Integer ID_Especie_Mascota;
 
     @Column(name = "Especie", nullable = false, length = 45)

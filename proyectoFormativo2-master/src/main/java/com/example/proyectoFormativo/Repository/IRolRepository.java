@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface IRoleRepository extends JpaRepository<Rol, Integer> {
-    // Método para buscar Rol por su nombre (para el RoleSeeder)
+public interface IRolRepository extends JpaRepository<Rol, Integer> {
+
+
     Optional<Rol> findByNombreRol(String nombreRol);
+
 }

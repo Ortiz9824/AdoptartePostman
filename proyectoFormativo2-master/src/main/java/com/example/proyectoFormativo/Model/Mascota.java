@@ -1,49 +1,35 @@
 package com.example.proyectoFormativo.Model;
 
-// 👇 ¡CAMBIO AQUÍ! De 'javax' a 'jakarta'
 import jakarta.persistence.*;
 import lombok.Data;
-import org.apache.catalina.User;
 
-@Data
+@Data // <-- Lombok DEBE crear los setters
 @Entity
-@Table(name = "mascotas")
+@Table(name = "mascota")
 public class Mascota {
 
+    // ... (campos id, nombreMascota, razaMascota, activo, usuario) ...
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Coincide con JpaRepository<..., Integer>
+    private Integer id;
 
-    @Column(name = "nombre_mascota", length = 100, nullable = false)
     private String nombreMascota;
-
-    @Column(name = "raza_mascota", length = 100)
     private String razaMascota;
+    private boolean activo = true;
 
-    @Column(name = "activo")
-    private boolean activo = true; // Para el borrado lógico
-
-    // --- RELACIONES ---
-
-    // Relación con el Dueño (User)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    public User usuario;
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    // Relación con Tamaño
+    // --- ¡ASEGÚRATE DE TENER ESTAS LÍNEAS! ---
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tamano_mascota_id")
-    private TamanoMascota tamanoMascota;
+    private TamanoMascota tamanoMascota; // <-- Esto crea setTamanoMascota()
 
-    // Relación con Tipo de Vivienda
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tipo_vivienda_id")
-    private TipoVivienda tipoVivienda;
+    private TipoVivienda tipoVivienda; // <-- Esto crea setTipoVivienda()
 
-    // ¡ESTA ES LA LÍNEA QUE DA EL OTRO ERROR!
-    // Relación con su Historia Médica
-    @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private HistoriaMedica historiaMedica;
-
-    // ... (Añade relaciones con Especie, EstadoMascota, etc. si las tienes)
+    // ... (relación con HistoriaMedica)
 }

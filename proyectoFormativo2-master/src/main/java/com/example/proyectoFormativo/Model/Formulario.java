@@ -10,6 +10,7 @@ public class Formulario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_formulario")
     private Integer ID_FORMULARIO;
 
     @Column(name = "CIUDAD", nullable = false, length = 45)

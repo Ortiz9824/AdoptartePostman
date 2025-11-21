@@ -12,4 +12,5 @@ public class ProyectoFormativoApplication {
 		SpringApplication.run(ProyectoFormativoApplication.class, args);
 	}
 
+
 }

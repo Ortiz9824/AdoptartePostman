@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+// Usa <Usuario, Integer> porque tu ID_USUARIO es Integer
 public interface IUsuarioRepository extends JpaRepository<Usuario, Integer> {
-    // Método para buscar Usuario por su email (para el Login)
     Optional<Usuario> findByEmailUsuario(String emailUsuario);
+    boolean existsByEmailUsuario(String emailUsuario);
 }

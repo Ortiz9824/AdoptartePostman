@@ -31,8 +31,8 @@ public class UsuarioService {
     public Usuario updateUsuario(Integer id, Usuario usuarioActualizado) {
         return repository.findById(id)
                 .map(usuario -> {
-                    usuario.setNombreUsuario(usuarioActualizado.getNombreUsuario());
-                    usuario.setApellidoUsuario(usuarioActualizado.getApellidoUsuario());
+                    usuario.setNombre(usuarioActualizado.getNombre());
+                    usuario.setApellido(usuarioActualizado.getApellido());
                     // ... actualizar otros campos
                     return repository.save(usuario);
                 }).orElse(null);

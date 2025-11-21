@@ -9,6 +9,7 @@ import lombok.Data;
 public class EstadoSolicitud {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_Estado_solicitud")
     private Integer ID_Estado_solicitud;
 
     @Column(name = "Estado", length = 45)

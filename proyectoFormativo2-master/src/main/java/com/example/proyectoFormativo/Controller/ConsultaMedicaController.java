@@ -17,10 +17,7 @@ public class ConsultaMedicaController {
     @Autowired
     private IConsultaMedicaService consultaService;
 
-    /**
-     * REQUISITO: "Editar historial registro" (Añadir un nuevo registro)
-     * Endpoint que se llama al guardar el formulario de consulta.
-     */
+
     @PostMapping
     public ResponseEntity<ConsultaResponseDto> crearConsulta(
             @Valid @RequestBody CrearConsultaRequestDto dto,

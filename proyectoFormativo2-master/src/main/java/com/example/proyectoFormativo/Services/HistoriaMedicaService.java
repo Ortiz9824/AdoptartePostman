@@ -2,49 +2,89 @@ package com.example.proyectoFormativo.Services;
 
 import com.example.proyectoFormativo.Dto.Response.ConsultaResponseDto;
 import com.example.proyectoFormativo.Dto.Response.HistoriaMedicaResponseDto;
-import com.example.proyectoFormativo.Interface.IHistoriaMedicaService;
+// import com.example.proyectoFormativo.Interface.IHistoriaMedicaService; // Interfaz de servicio si la usas
 import com.example.proyectoFormativo.Model.ConsultaMedica;
 import com.example.proyectoFormativo.Model.HistoriaMedica;
-import com.example.proyectoFormativo.Repository.IHistoriaMedicaRepository;
+import com.example.proyectoFormativo.Repository.IHistoriaMedicaRepository; // Usamos el nombre de clase sin la 'I'
+import com.example.proyectoFormativo.Repository.IMascotaRepository; // Necesario para crear un historial
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional; // Importante para métodos con múltiples repositorios
 
 @Service
 @RequiredArgsConstructor
-public class HistoriaMedicaService implements IHistoriaMedicaService {
+// Si usas IHistoriaMedicaService, descomenta la línea de implements
+// public class HistoriaMedicaService implements IHistoriaMedicaService {
+public class HistoriaMedicaService {
 
     private final IHistoriaMedicaRepository historiaRepo;
+    private final IMascotaRepository mascotaRepo;
 
-    @Override
-    public HistoriaMedicaResponseDto getHistoriaCompleta(Integer mascotaId) {
-        // 1. Busca el historial usando el método que creamos
+
+    public Optional<HistoriaMedica> obtenerPorId(Long historialId) {
+        return historiaRepo.findById(historialId);
+    }
+
+
+    @Transactional(readOnly = true)
+    public HistoriaMedicaResponseDto getHistoriaCompleta(Long mascotaId) {
+
+
         HistoriaMedica historia = historiaRepo.findByMascota_Id(mascotaId)
                 .orElseThrow(() -> new RuntimeException("No se encontró historial para la mascota con ID: " + mascotaId));
 
-        // 2. Mapea la entidad a DTO
         return convertirAHistoriaDto(historia);
     }
 
-    // --- MÉTODOS PRIVADOS DE MAPEO ---
+
+    @Transactional
+    public HistoriaMedica actualizarHistorial(Long id, HistoriaMedica historialDetalles) {
+        return historiaRepo.findById(id)
+                .map(historialExistente -> {
+
+                    historialExistente.setDescripcion(historialDetalles.getDescripcion());
+                    historialExistente.setRecomendaciones(historialDetalles.getRecomendaciones());
+
+
+                    return historiaRepo.save(historialExistente);
+                })
+                .orElseThrow(() -> new RuntimeException("Historial Médico no encontrado con ID: " + id));
+    }
+
+
+    @Transactional
+    public HistoriaMedica guardarHistorial(HistoriaMedica historial) {
+
+        if (historial.getFechaEvaluacion() == null) {
+            historial.setFechaEvaluacion(LocalDateTime.now());
+        }
+        return historiaRepo.save(historial);
+    }
+
+
 
     private HistoriaMedicaResponseDto convertirAHistoriaDto(HistoriaMedica historia) {
         HistoriaMedicaResponseDto dto = new HistoriaMedicaResponseDto();
         dto.setId(historia.getId());
-        dto.setFechaCreacion(historia.getFechaCreacion());
 
-        // Mapear datos de la mascota y dueño
+        dto.setFechaCreacion(historia.getFechaEvaluacion());
+
+        dto.setDescripcion(historia.getDescripcion());
+        dto.setRecomendaciones(historia.getRecomendaciones());
+
+
         dto.setMascotaId(historia.getMascota().getId());
         dto.setMascotaNombre(historia.getMascota().getNombreMascota());
         dto.setMascotaRaza(historia.getMascota().getRazaMascota());
-        dto.setDuenoNombre(historia.getMascota().getUsuario().getFirstname() + " " + historia.getMascota().getUsuario().getLastname());
 
-        // REQUISITO: Mapear la lista de consultas
-        // Si la lista está vacía, es la "primera vez"
+
         dto.setConsultas(
-                historia.getConsultas().stream() // Obtiene la List<ConsultaMedica>
-                        .map(this::convertirAConsultaDto) // Mapea cada una a DTO
+                historia.getConsultas().stream()
+                        .map(this::convertirAConsultaDto)
                         .collect(Collectors.toList())
         );
 
@@ -60,9 +100,8 @@ public class HistoriaMedicaService implements IHistoriaMedicaService {
         dto.setTratamiento(consulta.getTratamiento());
         dto.setObservaciones(consulta.getObservaciones());
 
-        // Mapear nombre del veterinario
         if (consulta.getVeterinario() != null) {
-            dto.setVeterinarioNombre("Dr. " + consulta.getVeterinario().getFirstname());
+            dto.setVeterinarioNombre("Dr. " + consulta.getVeterinario().getNombre());
         }
 
         return dto;

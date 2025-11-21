@@ -18,17 +18,17 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "usuario")
-public class Usuario implements UserDetails { // Implementamos UserDetails
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID_USUARIO;
 
     @Column(name = "NOMBRE_USUARIO", nullable = false, length = 45)
-    private String nombreUsuario;
+    private String nombre;
 
     @Column(name = "APELLIDO_USUARIO", length = 45)
-    private String apellidoUsuario;
+    private String apellido;
 
     @Column(name = "DOCUMENTO_USUARIO", nullable = false, length = 12)
     private String documentoUsuario;
@@ -48,7 +48,7 @@ public class Usuario implements UserDetails { // Implementamos UserDetails
     @Column(name = "TARJETA_PROFESIONAL", length = 45)
     private String tarjetaProfesional;
 
-    // --- Relaciones ---
+
     @ManyToOne(fetch = FetchType.EAGER) // EAGER para que cargue el rol con el usuario
     @JoinColumn(name = "Rol_ID_ROL", nullable = false)
     private Rol rol;
@@ -61,7 +61,7 @@ public class Usuario implements UserDetails { // Implementamos UserDetails
     @JoinColumn(name = "Tipo_Documento_idTipo_Documento", nullable = false)
     private TipoDocumento tipoDocumento; // Debes crear la entidad TipoDocumento
 
-    // --- Métodos de UserDetails ---
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // Devolvemos el nombre del ROL (ej. "Adoptante", "Administrador")

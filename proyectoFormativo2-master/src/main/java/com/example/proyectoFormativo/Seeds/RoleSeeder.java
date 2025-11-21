@@ -1,6 +1,5 @@
 package com.example.proyectoFormativo.Seeds;
 
-
 import com.example.proyectoFormativo.Model.Rol;
 import com.example.proyectoFormativo.Repository.IRolRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -21,15 +20,23 @@ public class RoleSeeder implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) {
-        List<String> roles = Arrays.asList("ADMIN", "BIBLIOTECARIO", "LECTOR");
+    public void run(String... args) throws Exception {
+        // Asegúrate que estos nombres coincidan con tu lógica (CLIENTE, VETERINARIO, etc.)
+        List<String> roles = Arrays.asList("CLIENTE", "VETERINARIO", "ADMIN");
 
         for (String roleName : roles) {
-            roleRepository.findByName(roleName).ifPresentOrElse(
-                    existing -> System.out.println("Rol existente: " + existing.getName()),
+
+            // ¡ARREGLO 1! Usa el método correcto
+            roleRepository.findByNombreRol(roleName).ifPresentOrElse(
+
+                    // Si existe, solo imprime
+                    existing -> System.out.println("Rol existente: " + existing.getNombreRol()),
+
+                    // Si no existe, créalo
                     () -> {
                         Rol role = new Rol();
-                        role.setName(roleName);
+                        // ¡ARREGLO 2! Usa el setter correcto
+                        role.setNombreRol(roleName);
                         roleRepository.save(role);
                         System.out.println("Rol creado: " + roleName);
                     }

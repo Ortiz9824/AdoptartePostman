@@ -1,8 +1,7 @@
 package com.example.proyectoFormativo.Model;
 
-import jakarta.persistence.*; // <-- Siempre jakarta
+import jakarta.persistence.*;
 import lombok.Data;
-import org.apache.catalina.User;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +12,7 @@ public class ConsultaMedica {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "fecha_consulta", nullable = false)
     private LocalDateTime fechaConsulta;
@@ -47,5 +46,5 @@ public class ConsultaMedica {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veterinario_id", nullable = false)
-    private User veterinario;
+    private Usuario veterinario; // <-- Esto ahora funciona porque el import es correcto
 }

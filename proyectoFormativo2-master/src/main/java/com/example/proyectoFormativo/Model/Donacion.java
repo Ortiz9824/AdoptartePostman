@@ -12,6 +12,7 @@ public class Donacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_DONACION")
     private Integer ID_DONACION;
 
     @Column(name = "VALOR_DONACION", nullable = false, precision = 8, scale = 2)
